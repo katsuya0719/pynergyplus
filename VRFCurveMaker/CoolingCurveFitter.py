@@ -6,6 +6,7 @@ import csv
 import matplotlib.pyplot as plt
 from VRFfunctions import *
 from VRF_IDFObjectsTemplates import *
+import pandas as pd
 
 #LeastSq R^2 Calc
 def calcerror(infodict,xdata):
@@ -128,9 +129,11 @@ def plotcurve(X,Y,Z,Z2):
     plt.show()
 
 #Load TotalData Array from Text file output of CellParser.py
+#These code may be able to replace by pandas
+"""
 TotalData = []
-csvreader = csv.reader(open("RXYQ18Cool.xls",newline='',encoding='utf-8'),quoting=csv.QUOTE_NONNUMERIC)
-#csvreader = csv.reader("RXYQ18Cool.xls")
+csvreader = csv.reader(open("RXYQ18Cool.xls",newline='',encoding='ascii'),quoting=csv.QUOTE_NONNUMERIC)
+
 
 for row in csvreader:
     print (row)
@@ -140,7 +143,9 @@ for row in TotalData[1:]:
         item=float(item)
     for item in row[:0]:
         item=int(item)
-
+"""
+df=pd.read_csv("RXYQ18Cool.xls")
+print
 #Find Cooling Cooling Capacity Ratio Modifier Function (CAPFT)
 # and Energy Input Ratio Modifier Function (EIRFT)
 #This script is designed to simplify the process described in:
