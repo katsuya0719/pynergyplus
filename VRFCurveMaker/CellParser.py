@@ -4,8 +4,12 @@ import re
 from xlrd import open_workbook
 import csv
 
-#Pulls Data out of a spreadsheet
 def GetData(sheetind):
+    """
+    Pulls Data out of a spreadsheet
+    :param sheetind:
+    :return:
+    """
 
     sheet = book.sheet_by_index(sheetind)
 
@@ -68,8 +72,12 @@ def GetData(sheetind):
                 TCind += 1
     return DataMatrix
 
-#Parses Cells
 def CellParse(cell):
+    """
+    Parses Cells
+    :param cell:
+    :return:
+    """
 #Parse the Cells with multiple values and convert to a list of floats
     numbers = re.findall(r"[+-]? *(?:\d+(?:\,\d*)?|\,\d+)(?:[eE][+-]?\d+)?", cell)
 
@@ -90,8 +98,6 @@ TotalData.append(['CombPer','Cap','IWB','ODB','TotCap','Power'])
 SheetData = []
 sheetcount = 0
 
-#print book.nsheets
-
 #Create array with all data from sheet
 #Excel sheets in the example files are created by uploading the Daikin Performance Data PDF
 #to http://www.pdftoexcelonline.com/ The excel file is parsed and laoded in to a python list
@@ -102,7 +108,7 @@ while book.nsheets > sheetcount:
     sheetcount += 1
 
 #Create a txt file with the total data array. This text file is loaded in the CurveFitter script
-csvwriter = csv.writer(file(Workbookname+".csv", "w"),quoting=csv.QUOTE_NONNUMERIC)
+csvwriter = csv.writer(Workbookname+".csv", "w",quoting=csv.QUOTE_NONNUMERIC)
 for row in TotalData:
     csvwriter.writerow(row)
 

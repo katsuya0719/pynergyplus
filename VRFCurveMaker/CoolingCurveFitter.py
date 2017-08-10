@@ -14,10 +14,14 @@ def calcerror(infodict,xdata):
     rsquared=1-(ss_err/ss_tot)
     return (rsquared)
 
-#Creates EIRFT and CAPFT
 def FTCurves(TotalData,RatEnergy):
-#Create the CAPFT and EIRFT Curves
-#Start by aggregating the IWB, ODB, and CapRatio
+    """
+    Create EIRFT and CAPFT
+    :param TotalData:
+    :param RatEnergy:
+    :return:
+    """
+    #Start by aggregating the IWB, ODB, and CapRatio
     IWB,ODB,CapRatio,PowerRatio=[],[],[],[]
     for measurement in TotalData:
         if measurement[0]==100.0:
@@ -125,8 +129,11 @@ def plotcurve(X,Y,Z,Z2):
 
 #Load TotalData Array from Text file output of CellParser.py
 TotalData = []
-csvreader = csv.reader(file("RXYQ18Cool.xls.csv"),quoting=csv.QUOTE_NONNUMERIC)
+csvreader = csv.reader(open("RXYQ18Cool.xls",newline='',encoding='utf-8'),quoting=csv.QUOTE_NONNUMERIC)
+#csvreader = csv.reader("RXYQ18Cool.xls")
+
 for row in csvreader:
+    print (row)
     TotalData.append(row)
 for row in TotalData[1:]:
     for item in row[1:]:
@@ -164,7 +171,7 @@ RatedCap = 49
 CCRCFactor, CCRCFactorErr = CCRCF(TotalData,RatedIWB,RatedODB)
 
 #Print Errors
-print CAPFTerr, EIRFTerr, EIRModFTLoerr, EIRFTHierr, CCRCFactorErr
+print (CAPFTerr, EIRFTerr, EIRModFTLoerr, EIRFTHierr, CCRCFactorErr)
 
 CurveObjectFile = open("CoolingCurveObjects.txt","w")
 CurveObjectFile.write(CoolingCapModifierFunction(CAPFTlist))
