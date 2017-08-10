@@ -15,7 +15,7 @@ def calcerror(infodict,xdata):
     rsquared=1-(ss_err/ss_tot)
     return (rsquared)
 
-def FTCurves(TotalData,RatEnergy):
+def FTCurves(df,RatEnergy):
     """
     Create EIRFT and CAPFT
     :param TotalData:
@@ -23,6 +23,7 @@ def FTCurves(TotalData,RatEnergy):
     :return:
     """
     #Start by aggregating the IWB, ODB, and CapRatio
+    """
     IWB,ODB,CapRatio,PowerRatio=[],[],[],[]
     for measurement in TotalData:
         if measurement[0]==100.0:
@@ -30,7 +31,12 @@ def FTCurves(TotalData,RatEnergy):
             ODB.append(measurement[3])
             CapRatio.append(measurement[4]/measurement[1])
             PowerRatio.append(measurement[5]/RatEnergy)
-
+    """
+    temp=df[df["CombPer"]==100]
+    IWB=temp.iloc[:,2]
+    ODB=temp.iloc[:,3]
+    CapRatio=temp.iloc[:,4]/temp.iloc[:,1]
+    PowerRatio=temp.iloc[:,5]/RatEnergy
     npIWB=np.array(IWB)
     IWBmax,IWBmin = max(npIWB),min(npIWB)
     npODB=np.array(ODB)
@@ -59,10 +65,12 @@ def FTCurves(TotalData,RatEnergy):
     return CAPFT,EIRFT,CAPFTerr,EIRFTerr,IWBmax,IWBmin,ODBmax,ODBmin
 
 #Creates EIRModFunctions - Modifies EIRRatio as a function of CombRatio
-def EIRModifier(TotalData,RatedIWB,RatedODB,RatEnergy):
+def EIRModifier(df,RatedIWB,RatedODB,RatEnergy):
+    """
     CombRatioHi,CapRatioHi,PowerRatioHi=[],[],[]
     CombRatioLo,CapRatioLo,PowerRatioLo=[],[],[]
     for measurement in TotalData:
+        print (measurement)
         if measurement[2] == RatedIWB and measurement[3] == RatedODB:
             if measurement[0] > 100.0:
                 CapRatioHi.append(measurement[4]/measurement[1])
@@ -72,8 +80,16 @@ def EIRModifier(TotalData,RatedIWB,RatedODB,RatEnergy):
                 CapRatioLo.append(measurement[4]/measurement[1])
                 PowerRatioLo.append(measurement[5]/RatEnergy)
                 CombRatioLo.append(measurement[0])
+    """
+    Hi = df[df["CombPer"] > 100]
+    Lo = df[df["CombPer"] <= 100]
 
-    #print CapRatio,PowerRatio,CombRatio
+    CapRatioHi=Hi.iloc[:,4]/Hi.iloc[:,1]
+    PowerRatioHi = Hi.iloc[:,5] / RatEnergy
+    CombRatioHi=Hi.iloc[:,0]
+    CapRatioLo = Lo.iloc[:, 4] / Lo.iloc[:, 1]
+    PowerRatioLo = Lo.iloc[:, 5] / RatEnergy
+    CombRatioLo = Lo.iloc[:, 0]
 
     npCombRatioHi = np.array(CombRatioHi)
     npPowerRatioHi = np.array(PowerRatioHi)
@@ -102,14 +118,18 @@ def EIRModifier(TotalData,RatedIWB,RatedODB,RatEnergy):
 
 #Creates Cooling Combination Ratio Correction Factor - Modifies Capacity as a function of CombRatio
 #Only applies to Comb Ratios above 100%
-def CCRCF(TotalData,RatedIWB,RatedODB):
-    CapRatio,CombRatio=[],[]
+def CCRCF(df,RatedIWB,RatedODB):
+    #CapRatio,CombRatio=[],[]
     CombDivisor = float(100)
+    """
     for measurement in TotalData:
         if measurement[2] == RatedIWB and measurement[3] == RatedODB and measurement[0] > 100:
             CombRatio.append(measurement[0]/CombDivisor)
             CapRatio.append(measurement[4]/measurement[1])
-
+    """
+    temp=df[(df["IWB"]==RatedIWB)&(df["ODB"]==RatedODB)&(df["CombPer"]>100)]
+    CombRatio=temp.iloc[:,0]/CombDivisor
+    CapRatio = temp.iloc[:,4]/temp.iloc[:,1]
     npCapRatio=np.array(CapRatio)
     npCombRatio=np.array(CombRatio)
 
@@ -144,8 +164,8 @@ for row in TotalData[1:]:
     for item in row[:0]:
         item=int(item)
 """
-df=pd.read_csv("RXYQ18Cool.xls")
-print
+TotalData=pd.read_csv("test.csv")
+
 #Find Cooling Cooling Capacity Ratio Modifier Function (CAPFT)
 # and Energy Input Ratio Modifier Function (EIRFT)
 #This script is designed to simplify the process described in:
